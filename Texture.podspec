@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = 'Texture'
-  spec.version      = '2.8'
+  spec.version      = '2.8.0.1'
   spec.license      =  { :type => 'Apache 2',  }
   spec.homepage     = 'http://texturegroup.org'
   spec.authors      = { 'Huy Nguyen' => 'hi@huytnguyen.me', 'Garrett Moon' => 'garrett@excitedpixel.com', 'Scott Goodson' => 'scottgoodson@gmail.com', 'Michael Schneider' => 'mischneider1@gmail.com', 'Adlai Holler' => 'adlai@icloud.com' }
