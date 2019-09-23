@@ -109,8 +109,8 @@
   if (![super hitTest:self.bounds.origin withEvent:event]) {
     return nil;
   }
-
-  return [self.node hitTest:point withEvent:event];
+  CGPoint pointOnNode = [self.node.view convertPoint:point fromView:self];
+  return [self.node hitTest:pointOnNode withEvent:event];
 }
 
 - (BOOL)pointInside:(CGPoint)point withEvent:(nullable UIEvent *)event
