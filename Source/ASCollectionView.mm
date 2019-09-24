@@ -805,6 +805,13 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   // Subclass hook
 }
 
+- (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
+{
+  CGPoint convertedPoint = [self.collectionNode.view convertPoint:point fromView:self];
+  CGPoint pointToTest = self.inverted == YES ? convertedPoint : point;
+  return [super hitTest:pointToTest withEvent:event];
+}
+
 #pragma mark Internal
 
 - (void)_configureCollectionViewLayout:(nonnull UICollectionViewLayout *)layout
