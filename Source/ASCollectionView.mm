@@ -1763,6 +1763,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
 
 - (void)layoutSubviews
 {
+  NSArray *nodesSizeChangedIndexPaths = nil;
   if (_cellsForLayoutUpdates.count > 0) {
     NSArray<ASCellNode *> *nodes = [_cellsForLayoutUpdates allObjects];
     [_cellsForLayoutUpdates removeAllObjects];
@@ -1770,7 +1771,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     NSMutableArray<ASCellNode *> *nodesSizeChanged = [[NSMutableArray alloc] init];
 
     [_dataController relayoutNodes:nodes nodesSizeChanged:nodesSizeChanged];
-    [self nodesDidRelayout:nodesSizeChanged];
+    nodesSizeChangedIndexPaths = [self nodesDidRelayout:nodesSizeChanged];
   }
 
   // Flush any pending invalidation action if needed.
@@ -1782,7 +1783,11 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
         if (ASCellLayoutModeIncludes(ASCellLayoutModeAlwaysReloadData)) {
           [self _superReloadData:nil completion:nil];
         } else {
-          [self _superPerformBatchUpdates:nil completion:nil];
+            [UIView performWithoutAnimation:^{
+                [self _superPerformBatchUpdates:^{
+                  [super reloadItemsAtIndexPaths:nodesSizeChangedIndexPaths];
+                } completion:nil];
+            }];
         }
       }
       break;
@@ -2350,12 +2355,12 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
   [self setNeedsLayout];
 }
 
-- (void)nodesDidRelayout:(NSArray<ASCellNode *> *)nodes
+- (NSArray *)nodesDidRelayout:(NSArray<ASCellNode *> *)nodes
 {
   ASDisplayNodeAssertMainThread();
   
   if (nodes.count == 0) {
-    return;
+    return nil;
   }
 
   const auto uikitIndexPaths = ASArrayByFlatMapping(nodes, ASCellNode *node, [self indexPathForNode:node]);
@@ -2389,6 +2394,7 @@ static NSString * const kReuseIdentifier = @"_ASCollectionReuseIdentifier";
     }
   }
   _nextLayoutInvalidationStyle = invalidationStyle;
+  return uikitIndexPaths;
 }
 
 #pragma mark - _ASDisplayView behavior substitutions
